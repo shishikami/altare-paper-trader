@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>shishikami | Lead Developer</title>
+<meta name="description" content="Lead Developer of Terrarium Desktop Pet | Godot 4.7 & Shader Developer | AI Workflows & Automation">
+<style>
+:root{--bg:#0d1117;--panel:#161b22;--border:#30363d;--text:#c9d1d9;--muted:#8b949e;--accent:#58a6ff;--green:#3fb950;--purple:#bc8cff;--shadow:0 0 0 1px rgba(88,166,255,.15),0 8px 24px rgba(1,4,9,.6)}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:radial-gradient(ellipse at top,#132033 0%,var(--bg) 60%);color:var(--text);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;line-height:1.6;min-height:100vh;display:flex;flex-direction:column}
+a{color:var(--accent);text-decoration:none;transition:color .2s}
+a:hover{color:#79c0ff;text-decoration:underline}
+.container{width:100%;max-width:960px;margin:0 auto;padding:48px 20px;flex:1}
+.hero{display:flex;gap:28px;align-items:center;background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:32px;box-shadow:var(--shadow)}
+.avatar{width:120px;height:120px;border-radius:50%;border:2px solid var(--green);box-shadow:0 0 18px rgba(63,185,80,.35);flex-shrink:0;object-fit:cover}
+.hero-text h1{font-size:2rem;color:#f0f6fc;letter-spacing:.5px}
+.hero-text h1 span{color:var(--green)}
+.bio{margin-top:8px;color:var(--muted);font-size:.98rem}
+.prompt{color:var(--green);margin-top:14px;font-size:.9rem}
+.prompt::before{content:"$ ";color:var(--muted)}
+.cursor{display:inline-block;width:8px;height:1em;background:var(--green);vertical-align:text-bottom;margin-left:4px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+section{margin-top:36px}
+h2{font-size:1rem;color:var(--muted);text-transform:none;margin-bottom:14px;letter-spacing:1px}
+h2::before{content:"## ";color:var(--purple)}
+.tags{display:flex;flex-wrap:wrap;gap:10px}
+.tag{border:1px solid var(--border);background:#21262d;color:var(--accent);padding:6px 12px;border-radius:999px;font-size:.85rem;transition:border-color .2s,transform .2s}
+.tag:hover{border-color:var(--accent);transform:translateY(-2px)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:22px;box-shadow:var(--shadow);display:flex;flex-direction:column;transition:transform .2s,border-color .2s}
+.card:hover{transform:translateY(-4px);border-color:var(--green)}
+.card h3{color:#f0f6fc;font-size:1.05rem}
+.card .repo{font-size:.8rem;color:var(--muted);margin-top:4px;word-break:break-all}
+.card p{margin-top:12px;font-size:.9rem;color:var(--text);flex:1}
+.card .badge{display:inline-block;margin-top:14px;font-size:.75rem;color:var(--purple);border:1px solid rgba(188,140,255,.4);border-radius:6px;padding:2px 8px;align-self:flex-start}
+.card .links{margin-top:14px;font-size:.85rem}
+.links-row{display:flex;flex-wrap:wrap;gap:12px;margin-top:4px}
+.btn{display:inline-block;border:1px solid var(--border);background:#21262d;color:var(--text);padding:10px 18px;border-radius:6px;font-size:.9rem}
+.btn:hover{border-color:var(--accent);color:#f0f6fc;text-decoration:none}
+footer{border-top:1px solid var(--border);background:#010409;padding:22px 20px;font-size:.85rem;color:var(--muted)}
+.foot-inner{max-width:960px;margin:0 auto;display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px}
+.foot-inner .ok{color:var(--green)}
+@media (max-width:640px){.hero{flex-direction:column;text-align:center;padding:24px}.prompt{justify-content:center}.hero-text h1{font-size:1.6rem}.container{padding:28px 14px}}
+</style>
+</head>
+<body>
+<main class="container">
+<header class="hero">
+<img class="avatar" src="https://github.com/shishikami.png" alt="shishikami avatar">
+<div class="hero-text">
+<h1>shishikami<span>@dev</span>:~$</h1>
+<p class="bio">Lead Developer of Terrarium Desktop Pet | Godot 4.7 &amp; Shader Developer | AI Workflows &amp; Automation</p>
+<p class="prompt">whoami<span class="cursor"></span></p>
+</div>
+</header>
+
+<section>
+<h2>skills</h2>
+<div class="tags">
+<span class="tag">Godot 4.7</span>
+<span class="tag">GDScript</span>
+<span class="tag">Shaders</span>
+<span class="tag">Python</span>
+<span class="tag">Git</span>
+<span class="tag">Linux</span>
+<span class="tag">Devin AI</span>
+<span class="tag">Webhooks</span>
+</div>
+</section>
+
+<section>
+<h2>projects</h2>
+<div class="grid">
+<article class="card">
+<h3>Terrarium Desktop Pet</h3>
+<div class="repo">shishikami/terrarium-desktop-pet</div>
+<p>Desktop "bottle garden" pet application with DIY Editor &amp; Pet Mode, Ghibli-inspired art style.</p>
+<span class="badge">Lead Developer</span>
+<div class="links"><a href="https://github.com/shishikami/terrarium-desktop-pet" target="_blank" rel="noopener">view repo &rarr;</a></div>
+</article>
+<article class="card">
+<h3>Salemind</h3>
+<div class="repo">wjsoj/salemind</div>
+<p>Open-source project contributions.</p>
+<span class="badge">Contributor</span>
+<div class="links"><a href="https://github.com/wjsoj/salemind" target="_blank" rel="noopener">view repo &rarr;</a></div>
+</article>
+</div>
+</section>
+
+<section>
+<h2>links</h2>
+<div class="links-row">
+<a class="btn" href="https://github.com/shishikami" target="_blank" rel="noopener">GitHub Profile</a>
+<a class="btn" href="https://github.com/shishikami?tab=repositories" target="_blank" rel="noopener">All Projects</a>
+</div>
+</section>
+</main>
+
+<footer>
+<div class="foot-inner">
+<span>&gt; <span class="ok">status: online</span> | built with html + css</span>
+<span>&copy; 2026 shishikami</span>
+</div>
+</footer>
+</body>
+</html>
