@@ -10,8 +10,10 @@ data reads from Kraken; public production market DATA is not a private trading e
 
 ## Safety defaults / honest scope
 
-- Example values in `config/example.json` are **UNAPPROVED placeholders**, unrelated to
-  historical 4,800 USDT budgets. `parameters_confirmed: false`; initialization creates both
+- Four limits in `config/example.json` are confirmed for this NEW local USD simulation:
+  initial cash $4,800, daily loss $96, planned stop risk per entry $48, and a fixed-initial
+  80% BTC/ETH holding ceiling ($3,840). See [confirmed/pending rules](config/CONFIRMED_RULES.md).
+  All other values remain **UNAPPROVED placeholders**. `parameters_confirmed: false`; initialization creates both
   a DB stopped flag and a persistent STOP sentinel. No account is armed by install, CI or status; restarting a stopped account keeps it stopped.
   After explicit arming, a configured service may resume that same simulation after a crash. Do not confirm parameters on behalf of the user.
 - Deterministic hourly trend (SMA5/SMA20) and mean-reversion (2% below SMA20; exit at mean)
@@ -20,13 +22,18 @@ data reads from Kraken; public production market DATA is not a private trading e
   is disabled, not secretly running or periodically thinking. Strategies cannot alter config.
 - Paper market fills use timestamped last public trade ± configured adverse slippage,
   fees charged on both sides, 8-decimal rounded-down quantities, no shorts or negative cash.
+  Entry-to-stop planned loss includes entry and stop-exit slippage plus both fees; reject
+  above $48, record the fixed trigger on entry. This is not a guaranteed actual loss cap.
   This is a simplified model, NOT order-book or partial-liquidity simulation. Large exits
   split at the per-order cap and remain exit-only until flat. Stop-loss checks every poll.
 - Hard buy checks: single order, available cash including fee, symbol exposure, total gross,
   combined BTC/ETH correlated-group exposure (conservative static group, NOT an estimated
-  correlation), and per-strategy share, all relative to marked post-fill equity.
+  correlation), and per-strategy share, all relative to marked post-fill equity. Total
+  marked holdings additionally cannot exceed min($3,840 fixed initial ceiling, 80% of
+  current post-fill equity). Tighter pending sublimits are unchanged. Price appreciation
+  blocks additions under this cap; it does not implicitly liquidate holdings.
 - Asia/Shanghai day loss = day-opening equity minus current equity including unrealized
-  P&L and costs. At the limit, new buys latch off until the next calendar day; risk-reducing
+  P&L and costs. At the confirmed $96 limit, new buys latch off until the next calendar day; risk-reducing
   sells remain allowed. On rollover, prior stored marks establish opening equity so the
   first newly observed loss is not discarded. This is conservative gap attribution, NOT
   a guaranteed exact midnight NAV. Stop/limit gaps can exceed loss limits, especially in
@@ -59,8 +66,10 @@ python3 -m papertrader --config config/example.json --data var/paper report
 ```
 
 `start --ack-paper-only` arms local simulation; `run` is the foreground loop. They are
-separate commands. Default example CANNOT be armed. Copy and review config OUTSIDE Git,
-obtain user confirmation, set confirmation true BEFORE initializing a new data directory.
+separate commands. Default example CANNOT be armed. Four confirmed limits do not confirm the remaining
+parameters or authorize activation. Copy and review config OUTSIDE Git, obtain confirmation
+of remaining parameters and separate activation approval before setting confirmation true
+and initializing an approved new data directory.
 The entire config is fingerprinted at initialization; changing it later is refused.
 Existing example-initialized data is not reusable after changing parameters; preserve it,
 choose a separate empty data dir for an explicitly approved new experiment. Do not reset

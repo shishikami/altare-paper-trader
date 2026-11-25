@@ -43,7 +43,8 @@ def validate_config(c):
                 "max_order_usd", "max_gross_fraction", "max_symbol_fraction",
                 "max_correlated_fraction", "max_strategy_fraction", "daily_loss_usd",
                 "quote_max_age_seconds", "candle_max_age_seconds", "poll_seconds",
-                "order_usd", "stop_loss_fraction", "event_enabled", "ai_enabled"}
+                "order_usd", "stop_loss_fraction", "event_enabled", "ai_enabled",
+                "max_planned_loss_usd", "max_holdings_initial_fraction"}
     if set(c) != required:
         raise SafetyError("config fields must exactly match example schema")
     if c["mode"] != "paper" or c["event_enabled"] is not False or c["ai_enabled"] is not False:
@@ -54,7 +55,7 @@ def validate_config(c):
         if dec(c[key]) <= 0:
             raise SafetyError("positive config required: " + key)
     for key in ("max_gross_fraction", "max_symbol_fraction", "max_correlated_fraction",
-                "max_strategy_fraction", "stop_loss_fraction"):
+                "max_strategy_fraction", "stop_loss_fraction", "max_holdings_initial_fraction"):
         if dec(c[key]) > 1:
             raise SafetyError("fraction above one: " + key)
     if dec(c["fee_bps"]) > 100 or dec(c["slippage_bps"]) > 500:
@@ -205,6 +206,8 @@ class Ledger:
                     "fees_usd": s["strategy_fees"][strategy]}
             return {**s, "strategy_summary": strategy_summary, "mode": "paper", "kill_switch": self.stop_path.exists(),
                     "equity_usd": str(equity(s, s["marks"])),
+                    "holdings_fixed_initial_cap_usd": str(dec(self.config["initial_cash_usd"]) * dec(self.config["max_holdings_initial_fraction"])),
+                    "holdings_current_equity_cap_usd": str(max(ZERO, equity(s, s["marks"])) * dec(self.config["max_holdings_initial_fraction"])),
                     "valuation": "last stored quotes, NOT necessarily current",
                     "parameters_confirmed": self.config["parameters_confirmed"]}
 
@@ -254,10 +257,24 @@ class Ledger:
             notional, fee = q * price, q * price * fee_rate
             if notional + fee > dec(s["cash"]):
                 return None, "cash"
+            # Planned risk includes adverse entry, adverse stop execution and both fees.
+            # The stop is a reference trigger, NOT a guaranteed execution price.
+            stop_price = price * (1 - dec(c["stop_loss_fraction"]))
+            stop_execution = stop_price * (1 - slip)
+            planned_loss = q * (price - stop_execution) + fee + q * stop_execution * fee_rate
+            if planned_loss > dec(c["max_planned_loss_usd"]):
+                return None, "planned_stop_loss"
             eq_after = equity(s, s["marks"]) - fee - q * (price - mark)
             gross = sum((dec(v["qty"]) * dec(s["marks"][v["symbol"]]) for v in s["positions"].values()), ZERO)
             symbol_total = sum((dec(v["qty"]) * mark for v in s["positions"].values() if v["symbol"] == m.symbol), ZERO)
             strategy_total = sum((dec(v["qty"]) * dec(s["marks"][v["symbol"]]) for v in s["positions"].values() if v["strategy"] == strategy), ZERO)
+            # Never grow the fixed initial-budget ceiling after gains. After losses,
+            # also preserve the same cash fraction against current post-fill equity.
+            holdings_fraction = dec(c["max_holdings_initial_fraction"])
+            holdings_cap = min(dec(c["initial_cash_usd"]) * holdings_fraction,
+                               max(ZERO, eq_after) * holdings_fraction)
+            if gross + q * mark > holdings_cap:
+                return None, "holdings_initial_or_equity_cap"
             for value, limit, reason in [(gross + q * mark, "max_gross_fraction", "gross"),
                                           (gross + q * mark, "max_correlated_fraction", "correlated_BTC_ETH"),
                                           (symbol_total + q * mark, "max_symbol_fraction", "symbol"),
@@ -266,6 +283,7 @@ class Ledger:
                     return None, reason
             cash_delta, qty_delta = -(notional + fee), q
             p["qty"], p["cost"] = str(q), str(notional + fee)
+            p["stop_price"] = str(stop_price)
         else:
             if qty <= 0:
                 return None, "no_position"
@@ -289,7 +307,9 @@ class Ledger:
             s["positions"][key] = p
         s["fill_count"] += 1
         return {"id": event_id + ":fill:" + str(s["fill_count"]), "decision_id": event_id,
-                "sequence": s["fill_count"], "at": now, "strategy": strategy, "symbol": m.symbol, "side": side,
+                "sequence": s["fill_count"],
+                "planned_loss_usd": str(planned_loss) if side == "buy" else None,
+                "stop_price": p["stop_price"], "at": now, "strategy": strategy, "symbol": m.symbol, "side": side,
                 "qty_delta": str(qty_delta), "cash_delta": str(cash_delta), "price": str(price),
                 "fee": str(fee), "reference_price": m.price, "mode": "paper"}, None
 
@@ -323,7 +343,7 @@ class Ledger:
                         s["day_latched"] = True
                     m, key = markets[symbol], strategy + ":" + symbol
                     holding = key in s["positions"]
-                    emergency = holding and dec(m.price) <= (dec(s["positions"][key]["cost"]) / dec(s["positions"][key]["qty"])) * (1 - dec(self.config["stop_loss_fraction"]))
+                    emergency = holding and dec(m.price) <= dec(s["positions"][key]["stop_price"])
                     # A previous partial stop exit remains an exit until fully flat.
                     exiting = holding and s["positions"][key].get("exiting", False)
                     event_id = key + ":" + str(m.candle_at)

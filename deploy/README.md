@@ -23,8 +23,9 @@ credentials. No root key or exchange key belongs in this repository or artifacts
    `sudo bash deploy/install.sh --stage-only COMMIT`. This creates isolated paths/account
    and installs a disabled unit. It refuses existing installations/accounts/paths rather
    than replacing anything. Review any partial staging failure before retrying.
-5. As administrator, edit `/etc/paper-trader/config.json`: replace ALL example limits and
-   set `parameters_confirmed` true only after user approval. Configure BEFORE ledger init;
+5. As administrator, edit `/etc/paper-trader/config.json`: preserve the four confirmed limits in `config/CONFIRMED_RULES.md`, review the remaining
+   provisional values and day-loss policy, and set `parameters_confirmed` true only after
+   separate user approval of remaining parameters and activation. Configure BEFORE ledger init;
    the config fingerprint is immutable thereafter. This marker is an operator guardrail,
    not cryptographic proof of user consent. Config and source are root-owned, not writable
    by the service. No secrets or `.env` are needed for the local paper implementation.

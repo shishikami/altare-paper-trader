@@ -31,6 +31,8 @@ class SafetyTests(unittest.TestCase):
         self.root = Path(self.tmp.name) / "paper"
         self.c = copy.deepcopy(EXAMPLE)
         self.c["parameters_confirmed"] = True
+        # Original 1,000-dollar SYNTHETIC regression fixture, not user budget.
+        self.c["initial_cash_usd"], self.c["daily_loss_usd"] = "1000", "20"
         self.ledger = Ledger(self.root, self.c)
         self.ledger.initialize()
         self.ledger.start(True)
@@ -161,7 +163,8 @@ class SafetyTests(unittest.TestCase):
         for key, value in [("mode", "live"), ("event_enabled", True), ("ai_enabled", True),
                            ("order_usd", "51"), ("max_order_usd", "-1"), ("fee_bps", "NaN"),
                            ("max_gross_fraction", "1.1"), ("parameters_confirmed", "yes"),
-                           ("quote_max_age_seconds", 99999)]:
+                           ("quote_max_age_seconds", 99999), ("max_planned_loss_usd", "0"),
+                           ("max_holdings_initial_fraction", "1.01")]:
             with self.subTest(key=key), self.assertRaises(SafetyError):
                 validate_config({**self.c, key: value})
         with self.assertRaises(SafetyError):

@@ -1,7 +1,7 @@
 {
   "mode": "paper",
   "parameters_confirmed": false,
-  "initial_cash_usd": "1000",
+  "initial_cash_usd": "4800",
   "fee_bps": "26",
   "slippage_bps": "10",
   "max_order_usd": "50",
@@ -10,11 +10,13 @@
   "max_symbol_fraction": "0.30",
   "max_correlated_fraction": "0.40",
   "max_strategy_fraction": "0.25",
-  "daily_loss_usd": "20",
+  "daily_loss_usd": "96",
   "stop_loss_fraction": "0.05",
   "quote_max_age_seconds": 90,
   "candle_max_age_seconds": 3780,
   "poll_seconds": 60,
   "event_enabled": false,
-  "ai_enabled": false
+  "ai_enabled": false,
+  "max_planned_loss_usd": "48",
+  "max_holdings_initial_fraction": "0.80"
 }
