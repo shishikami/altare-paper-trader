@@ -1,0 +1,37 @@
+[Unit]
+Description=Altare local paper trader (never exchange orders)
+After=network-online.target
+Wants=network-online.target
+ConditionPathExists=/var/lib/paper-trader/ledger.sqlite3
+
+[Service]
+Type=simple
+User=papertrader
+Group=papertrader
+WorkingDirectory=/opt/paper-trader/current
+ExecStart=/usr/bin/python3 -m papertrader --config /etc/paper-trader/config.json --data /var/lib/paper-trader run
+Environment=PYTHONDONTWRITEBYTECODE=1
+Environment=PYTHONUNBUFFERED=1
+Restart=on-failure
+RestartSec=30
+UMask=0077
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+CapabilityBoundingSet=
+ReadWritePaths=/var/lib/paper-trader
+StandardOutput=journal
+StandardError=journal
+MemoryMax=256M
+CPUQuota=25%
+TasksMax=32
+
+[Install]
+WantedBy=multi-user.target

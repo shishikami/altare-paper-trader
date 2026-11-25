@@ -1,0 +1,22 @@
+name: Offline safety tests
+on:
+  push:
+    branches: [main, 'feat/**']
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  offline:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Python version
+        run: python3 --version
+      - name: Offline tests (no credentials or feed requests)
+        run: python3 -m unittest discover -s tests -v
+      - name: Syntax checks
+        run: |
+          python3 -m compileall -q papertrader tests
+          bash -n deploy/install.sh
