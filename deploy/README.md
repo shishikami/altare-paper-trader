@@ -10,7 +10,7 @@ credentials. No root key or exchange key belongs in this repository or artifacts
    existing services and path/account conflicts. Supported staging script: Debian/Ubuntu,
    Python 3.11+, systemd, `useradd`, and outbound HTTPS to api.kraken.com. No web port needed.
 2. Run manual release-preparation workflow on an approved commit. Download named artifact
-   with `gh run download RUN_ID -R shishikami/homepage-for-altare -n paper-release-COMMIT`.
+   with `gh run download RUN_ID -R shishikami/altare-paper-trader -n paper-release-COMMIT`.
    This needs repo read / Actions read authorization; do not copy a general-purpose broad
    GitHub token to the server. A checksum packaged alongside an archive is an integrity
    check, not authentication: authenticate GitHub HTTPS and approve the source commit.
